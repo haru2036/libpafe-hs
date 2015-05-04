@@ -1,6 +1,6 @@
- dist/*
- .*
- ,/*
- *.swp
- .cabal-sandbox
- cabal.sandbox.config
+dist/*
+.*
+,/*
+*.swp
+.cabal-sandbox
+cabal.sandbox.config
