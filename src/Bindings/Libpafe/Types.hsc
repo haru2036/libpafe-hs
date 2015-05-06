@@ -1,7 +1,7 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 module Bindings.Libpafe.Types where
 
-#include "libpafe.h"
+#include <libpafe/libpafe.h>
 
 import Foreign.Ptr
 

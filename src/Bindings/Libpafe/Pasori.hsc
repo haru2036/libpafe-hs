@@ -1,8 +1,8 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 
 module Bindings.Libpafe.Pasori where
-#include "libpafe.h"
-#include "pasori_command.h"
+#include <libpafe/libpafe.h>
+#include <libpafe/pasori_command.h>
 
 import Foreign.Ptr
 import Foreign.C.Types
