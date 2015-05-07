@@ -1,9 +1,9 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
-
 module Bindings.Libpafe.Pasori (
-  preparePasori
+  pasoriPrepare
  ,pasoriClose
 ) where
+
 #include <libpafe/libpafe.h>
 #include <libpafe/pasori_command.h>
 
@@ -11,8 +11,8 @@ import Foreign.Ptr
 import Foreign.C.Types
 import Bindings.Libpafe.Types
 
-preparePasori :: IO (Maybe (Ptr Pasori))
-preparePasori = do
+pasoriPrepare :: IO (Maybe (Ptr Pasori))
+pasoriPrepare = do
   pasori <- pasori_open
   result <- pasori_init pasori
   case result of
