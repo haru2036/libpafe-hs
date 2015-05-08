@@ -14,6 +14,7 @@ import Foreign.C.Types
 import Foreign.Storable
 import Foreign.Marshal.Array
 import Control.Monad.Reader
+import Data.Word
 
 {-
 data FelicaBlockInfo = FelicaBlockInfo {
@@ -37,8 +38,8 @@ data FelicaBlock = FelicaBlock {
 
 #def typedef struct felica_area Area;
 
-type CUInt8 = CChar
-type CUInt16 = CShort
+type CUInt8 = Word8
+type CUInt16 = Word16
 
 data Pasori
 data Felica = Felica {
