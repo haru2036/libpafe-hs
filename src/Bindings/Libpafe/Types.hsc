@@ -1,10 +1,5 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
-module Bindings.Libpafe.Types (
-  Pasori
- ,Felica
- ,CUInt8
- ,CUInt16
-)
+module Bindings.Libpafe.Types
 where
 
 #include <libpafe/libpafe.h>
@@ -103,3 +98,6 @@ instance Storable Area where
 
 instance Show Felica where
   show = show . idm
+
+instance Show Area where
+  show = show . code
