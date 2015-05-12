@@ -26,18 +26,18 @@ foreign import ccall felica_read :: Ptr Felica -> Ptr Int -> Ptr FelicaBlockInfo
 foreign import ccall felica_read_single :: Ptr Felica -> Int -> Int -> CUInt8 -> Ptr CUInt8 -> IO Int
 
 felicaRead :: Ptr Felica -> Int -> FelicaBlockInfo -> IO (Maybe [CUInt8])
-felicaRead felica bufferLength blockInfo = do
+felicaRead felica blocksCount blockInfo = do
   bufferLenPtr <- malloc 
   blockInfoPtr <- malloc
   _ <- poke blockInfoPtr blockInfo 
-  _ <- poke bufferLenPtr bufferLength
-  bufferPtr <- mallocForeignPtrArray bufferLength
+  _ <- poke bufferLenPtr blocksCount
+  bufferPtr <- mallocForeignPtrArray blocksCount
   result <- withForeignPtr bufferPtr $ felica_read felica bufferLenPtr blockInfoPtr
   free bufferLenPtr
   free blockInfoPtr
   case result of
     0 -> do
-      resultValue <- withForeignPtr bufferPtr (peekArray bufferLength)
+      resultValue <- withForeignPtr bufferPtr (peekArray (blocksCount * 8))
       return $ Just resultValue
     err -> print err >> return Nothing
 
