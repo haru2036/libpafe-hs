@@ -11,17 +11,6 @@ import Foreign.Marshal.Array
 import Control.Monad.Reader
 import Data.Word
 
-{-
-data FelicaBlockInfo = FelicaBlockInfo {
-                                        service :: CUInt16
-                                        ,mode :: CUInt8
-                                        ,block :: CUInt16
-                                       }deriving (Storable)
-
--}
-data FelicaBlock = FelicaBlock { 
-                                blockData :: [CUInt8]
-                               }
 
 #def typedef struct _felica_block_info FelicaBlockInfo;
 
@@ -55,6 +44,16 @@ data Area = Area {
            ,bin :: CUInt16
            ,nextArea :: Ptr Area
            }
+
+data FelicaBlockInfo = FelicaBlockInfo {
+                                         blockService :: CUInt16
+                                        ,mode :: CUInt8
+                                        ,block :: CUInt16
+                                       }
+
+data FelicaBlock = FelicaBlock { 
+                                blockData :: [CUInt8]
+                               }
 
 instance Storable Felica where
   sizeOf x = #size felica
@@ -95,6 +94,22 @@ instance Storable Area where
     (#poke felica_area, attr) ptr attrib
     (#poke felica_area, bin) ptr binary
     (#poke felica_area, next) ptr nextarea
+
+instance Storable FelicaBlockInfo where
+  sizeOf x = #size felica_block_info
+  alignment = sizeOf
+  peek ptr = do
+    svc <- (#peek felica_block_info, service) ptr
+    md <- (#peek felica_block_info, mode) ptr
+    blk <- (#peek felica_block_info, block) ptr
+    return $ FelicaBlockInfo svc md blk
+  poke ptr (FelicaBlockInfo svc md blk) = do
+    (#poke felica_block_info, service) ptr svc
+    (#poke felica_block_info, mode) ptr md
+    (#poke felica_block_info, block) ptr blk
+
+instance Show FelicaBlockInfo where
+  show = show . block
 
 instance Show Felica where
   show = show . idm
