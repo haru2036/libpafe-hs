@@ -8,7 +8,6 @@ import Foreign.Ptr
 import Foreign.C.Types
 import Foreign.Storable
 import Foreign.Marshal.Array
-import Control.Monad.Reader
 import Data.Word
 
 

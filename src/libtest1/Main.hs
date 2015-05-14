@@ -3,6 +3,9 @@ import Bindings.Libpafe.Types
 import Bindings.Libpafe.Felica
 import Foreign.Ptr
 import Foreign.Storable
+import Data.ByteString.Lazy
+import Codec.Text.IConv
+import Data.Maybe
 
 main :: IO()
 main = do
@@ -15,10 +18,8 @@ main = do
       print felica
       print "PMm is:"
       print $ pmm felica
-      -- maybeBlockWord <- mapM (felicaReadSingle felicaPtr 0 0x1A8B) [0..10]
-      maybeBlockWord <- felicaRead felicaPtr 1 $ FelicaBlockInfo 0x1A8B 0 0 
-      print maybeBlockWord
-
+      maybeBlockWord <- felicaReadSingle felicaPtr 0 0x1A8B 1
+      print $ convert "EUCJP" "UTF8" $ pack $ fromJust maybeBlockWord
       {-
       print "Area Number is:"
       print $ areaNum felica
@@ -33,3 +34,4 @@ main = do
       -}
       pasoriClose pasori
     Nothing -> print "pasori is nothing"
+

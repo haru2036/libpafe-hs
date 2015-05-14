@@ -1,8 +1,8 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 module Bindings.Libpafe.Felica(
   felica_polling
- ,felicaRead
  ,felicaReadSingle
+ ,justReslts
 ) where
 
 import Foreign.Ptr
@@ -25,21 +25,24 @@ foreign import ccall felica_read :: Ptr Felica -> Ptr Int -> Ptr FelicaBlockInfo
 -- int felica_read_single(felica * f, int servicecode, int mode, uint8 block, uint8 *data);
 foreign import ccall felica_read_single :: Ptr Felica -> Int -> Int -> CUInt8 -> Ptr CUInt8 -> IO Int
 
-felicaRead :: Ptr Felica -> Int -> FelicaBlockInfo -> IO (Maybe [CUInt8])
+
+{-
+felicaRead :: Ptr Felica -> Int -> [FelicaBlockInfo] -> IO (Maybe [CUInt8])
 felicaRead felica blocksCount blockInfo = do
-  bufferLenPtr <- malloc 
+  blocksLenPtr <- mallocArray blocksCount
   blockInfoPtr <- malloc
-  _ <- poke blockInfoPtr blockInfo 
-  _ <- poke bufferLenPtr blocksCount
+  _ <- pokeArray blockInfoPtr blockInfo 
+  _ <- poke blocksLenPtr blocksCount
   bufferPtr <- mallocForeignPtrArray blocksCount
-  result <- withForeignPtr bufferPtr $ felica_read felica bufferLenPtr blockInfoPtr
-  free bufferLenPtr
+  result <- withForeignPtr bufferPtr $ felica_read felica blocksLenPtr blockInfoPtr
+  free blocksLenPtr
   free blockInfoPtr
   case result of
     0 -> do
       resultValue <- withForeignPtr bufferPtr (peekArray (blocksCount * 8))
       return $ Just resultValue
     err -> print err >> return Nothing
+-}
 
 felicaReadSingle :: Ptr Felica -> Int -> Int -> CUInt8 -> IO (Maybe [CUInt8])
 felicaReadSingle felica mode servCode blk = do
@@ -47,8 +50,13 @@ felicaReadSingle felica mode servCode blk = do
   result <- withForeignPtr bufferPtr $ felica_read_single felica servCode mode blk 
   case result of
     0 -> do
-      resultvValue <- withForeignPtr bufferPtr (peekArray 8)
+      resultvValue <- withForeignPtr bufferPtr (peekArray 16)
       return $ Just resultvValue
     err -> return Nothing
 
 
+concatMaybe :: [a] -> Maybe [a] -> [a]
+concatMaybe acc (Just x) = acc ++ x
+concatMaybe acc Nothing  = acc
+
+justReslts = foldl concatMaybe [] 
