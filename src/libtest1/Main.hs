@@ -12,7 +12,8 @@ main = do
   maybePasori <- pasoriPrepare
   case maybePasori of
     Just pasori -> do
-      felicaPtr <- felica_polling pasori 0xfe00 0 0 
+      maybeFelicaPtr <- felicaPolling pasori 0xfe00 0 0 
+      let felicaPtr = fromJust maybeFelicaPtr
       felica <- peek felicaPtr
       print "IDm is:"
       print felica
@@ -20,18 +21,6 @@ main = do
       print $ pmm felica
       maybeBlockWord <- felicaReadSingle felicaPtr 0 0x1A8B 1
       print $ convert "EUCJP" "UTF8" $ pack $ fromJust maybeBlockWord
-      {-
-      print "Area Number is:"
-      print $ areaNum felica
-      print "Area is:"
-      print $ felicaArea felica
-      print "ServiceNumber is:"
-      print $ serviceNum felica
-      print "Service is:"
-      print $ service felica
-      print "NextFelica Ptr is:"
-      print $ nextFelica felica
-      -}
       pasoriClose pasori
-    Nothing -> print "pasori is nothing"
+    Nothing -> print "Pasori is not connected"
 

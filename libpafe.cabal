@@ -15,6 +15,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 stability:           alpha
+
 library
   exposed-modules:     Bindings.Libpafe.Types     
                       ,Bindings.Libpafe.Pasori

@@ -1,6 +1,6 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 module Bindings.Libpafe.Felica(
-  felica_polling
+  felicaPolling
  ,felicaReadSingle
  ,justReslts
 ) where
@@ -26,25 +26,23 @@ foreign import ccall felica_read :: Ptr Felica -> Ptr Int -> Ptr FelicaBlockInfo
 foreign import ccall felica_read_single :: Ptr Felica -> Int -> Int -> CUInt8 -> Ptr CUInt8 -> IO Int
 
 
-{-
-felicaRead :: Ptr Felica -> Int -> [FelicaBlockInfo] -> IO (Maybe [CUInt8])
-felicaRead felica blocksCount blockInfo = do
-  blocksLenPtr <- mallocArray blocksCount
-  blockInfoPtr <- malloc
-  _ <- pokeArray blockInfoPtr blockInfo 
-  _ <- poke blocksLenPtr blocksCount
-  bufferPtr <- mallocForeignPtrArray blocksCount
-  result <- withForeignPtr bufferPtr $ felica_read felica blocksLenPtr blockInfoPtr
-  free blocksLenPtr
-  free blockInfoPtr
-  case result of
-    0 -> do
-      resultValue <- withForeignPtr bufferPtr (peekArray (blocksCount * 8))
-      return $ Just resultValue
-    err -> print err >> return Nothing
--}
+felicaPolling :: Ptr Pasori  -- ^ Pointer for Pasori
+  -> CUInt16 -- ^ ServiceCode
+  -> CUInt8 -- ^ RFU (is normally 0)
+  -> CUInt8 -- ^ Timeslot
+  -> IO (Maybe (Ptr Felica))
+felicaPolling p sc rfu timeslot = felica_polling p sc rfu timeslot >>= return . nullToNothing
 
-felicaReadSingle :: Ptr Felica -> Int -> Int -> CUInt8 -> IO (Maybe [CUInt8])
+nullToNothing :: Ptr Felica -> Maybe (Ptr Felica)
+nullToNothing ptr 
+  |nullPtr == ptr = Nothing 
+  |otherwise = Just ptr
+
+felicaReadSingle :: Ptr Felica -- ^ A pointer for Felica
+  -> Int -- ^ Felica reading mode
+  -> Int -- ^ Service code of block
+  -> CUInt8  -- ^ Block number
+  -> IO (Maybe [CUInt8])
 felicaReadSingle felica mode servCode blk = do
   bufferPtr <- mallocForeignPtrArray 8
   result <- withForeignPtr bufferPtr $ felica_read_single felica servCode mode blk 
