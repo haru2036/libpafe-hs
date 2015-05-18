@@ -4,6 +4,7 @@ module Bindings.Libpafe.Felica(
  ,felicaReadSingle
  ,justReslts
 ) where
+import Prelude hiding (sequence)
 
 import Foreign.Ptr
 import Foreign.ForeignPtr
@@ -11,6 +12,7 @@ import Foreign.C.Types
 import Foreign.Storable
 import Foreign.Marshal.Alloc
 import Foreign.Marshal.Array
+import Data.Traversable
 import Bindings.Libpafe.Types
 import Bindings.Libpafe.Pasori
 
@@ -26,24 +28,33 @@ foreign import ccall felica_read :: Ptr Felica -> Ptr Int -> Ptr FelicaBlockInfo
 foreign import ccall felica_read_single :: Ptr Felica -> Int -> Int -> CUInt8 -> Ptr CUInt8 -> IO Int
 
 
-felicaPolling :: Ptr Pasori  -- ^ Pointer for Pasori
-  -> CUInt16 -- ^ ServiceCode
+felicaPolling :: CUInt16 -- ^ ServiceCode
   -> CUInt8 -- ^ RFU (is normally 0)
   -> CUInt8 -- ^ Timeslot
-  -> IO (Maybe (Ptr Felica))
-felicaPolling p sc rfu timeslot = felica_polling p sc rfu timeslot >>= return . nullToNothing
+  -> Ptr Pasori  -- ^ Pointer for Pasori
+  -> IO (Maybe (ForeignPtr Felica))
+felicaPolling sc rfu timeslot p = felica_polling p sc rfu timeslot >>= b
+
+a :: Ptr Felica -> Maybe (IO (ForeignPtr Felica))
+a x = nullToNothing x >>= return . freeForeignPtr  
+
+b :: Ptr Felica -> IO (Maybe (ForeignPtr Felica))
+b = sequence . a 
 
 nullToNothing :: Ptr Felica -> Maybe (Ptr Felica)
 nullToNothing ptr 
   |nullPtr == ptr = Nothing 
   |otherwise = Just ptr
 
-felicaReadSingle :: Ptr Felica -- ^ A pointer for Felica
-  -> Int -- ^ Felica reading mode
+freeForeignPtr :: Ptr a -> IO (ForeignPtr a)
+freeForeignPtr = newForeignPtr finalizerFree
+
+felicaReadSingle :: Int -- ^ Felica reading mode
   -> Int -- ^ Service code of block
   -> CUInt8  -- ^ Block number
+  -> Ptr Felica -- ^ A pointer for Felica
   -> IO (Maybe [CUInt8])
-felicaReadSingle felica mode servCode blk = do
+felicaReadSingle mode servCode blk felica = do
   bufferPtr <- mallocForeignPtrArray 8
   result <- withForeignPtr bufferPtr $ felica_read_single felica servCode mode blk 
   case result of
