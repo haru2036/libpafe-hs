@@ -2,7 +2,6 @@
 module Bindings.Libpafe.Felica(
   felicaPolling
  ,felicaReadSingle
- ,justReslts
 ) where
 import Prelude hiding (sequence)
 
@@ -33,21 +32,7 @@ felicaPolling :: CUInt16 -- ^ ServiceCode
   -> CUInt8 -- ^ Timeslot
   -> Ptr Pasori  -- ^ Pointer for Pasori
   -> IO (Maybe (ForeignPtr Felica))
-felicaPolling sc rfu timeslot p = felica_polling p sc rfu timeslot >>= b
-
-a :: Ptr Felica -> Maybe (IO (ForeignPtr Felica))
-a x = nullToNothing x >>= return . freeForeignPtr  
-
-b :: Ptr Felica -> IO (Maybe (ForeignPtr Felica))
-b = sequence . a 
-
-nullToNothing :: Ptr Felica -> Maybe (Ptr Felica)
-nullToNothing ptr 
-  |nullPtr == ptr = Nothing 
-  |otherwise = Just ptr
-
-freeForeignPtr :: Ptr a -> IO (ForeignPtr a)
-freeForeignPtr = newForeignPtr finalizerFree
+felicaPolling sc rfu timeslot p = felica_polling p sc rfu timeslot >>= maybeForeignPtr 
 
 felicaReadSingle :: Int -- ^ Felica reading mode
   -> Int -- ^ Service code of block
@@ -62,6 +47,21 @@ felicaReadSingle mode servCode blk felica = do
       resultvValue <- withForeignPtr bufferPtr (peekArray 16)
       return $ Just resultvValue
     err -> return Nothing
+
+ptrToForeignPtr :: Ptr Felica -> Maybe (IO (ForeignPtr Felica))
+ptrToForeignPtr x = nullToNothing x >>= return . freeForeignPtr  
+
+maybeForeignPtr :: Ptr Felica -> IO (Maybe (ForeignPtr Felica))
+maybeForeignPtr = sequence . ptrToForeignPtr
+
+nullToNothing :: Ptr Felica -> Maybe (Ptr Felica)
+nullToNothing ptr 
+  |nullPtr == ptr = Nothing 
+  |otherwise = Just ptr
+
+freeForeignPtr :: Ptr a -> IO (ForeignPtr a)
+freeForeignPtr = newForeignPtr finalizerFree
+
 
 
 concatMaybe :: [a] -> Maybe [a] -> [a]
