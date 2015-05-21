@@ -1,5 +1,11 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
-module Bindings.Libpafe.Types
+module Bindings.Libpafe.Types(
+  Felica(p, systemCode, idm, pmm, areaNum, felicaArea, serviceNum, service, nextFelica)
+ ,Pasori
+ ,CUInt8
+ ,CUInt16
+ ,FelicaBlockInfo
+)
 where
 
 #include <libpafe/libpafe.h>
