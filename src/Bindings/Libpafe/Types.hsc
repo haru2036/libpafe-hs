@@ -1,10 +1,10 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 module Bindings.Libpafe.Types(
-  Felica(p, systemCode, idm, pmm, areaNum, felicaArea, serviceNum, service, nextFelica)
+  Felica(..)
  ,Pasori
  ,CUInt8
  ,CUInt16
- ,FelicaBlockInfo
+ ,FelicaBlockInfo(..)
 )
 where
 
