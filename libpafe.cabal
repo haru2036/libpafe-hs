@@ -22,7 +22,7 @@ library
                       ,Bindings.Libpafe.Felica
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.6 && <4.8
   extra-libraries:     pafe
 
   hs-source-dirs:      src
@@ -31,7 +31,7 @@ library
 Test-Suite test-read
     type:              exitcode-stdio-1.0
     main-is:           tests/test-read.hs
-    build-depends:     base
+  build-depends:       base >=4.6 && <4.8
                       ,libpafe
                       ,bytestring
                       ,iconv
@@ -39,7 +39,7 @@ Test-Suite test-read
 Test-Suite test-read-fcf
     type:              exitcode-stdio-1.0
     main-is:           tests/test-read-fcf.hs
-    build-depends:     base
+  build-depends:       base >=4.6 && <4.8
                       ,libpafe
                       ,bytestring
                       ,iconv
