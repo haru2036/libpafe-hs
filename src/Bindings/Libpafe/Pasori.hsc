@@ -10,6 +10,8 @@ module Bindings.Libpafe.Pasori (
 import Foreign.Ptr
 import Foreign.C.Types
 import Bindings.Libpafe.Types
+import Control.Monad.Trans.Maybe
+import Control.Monad.IO.Class
 
 pasoriPrepare :: IO (Maybe (Ptr Pasori))
 pasoriPrepare = do
@@ -19,6 +21,14 @@ pasoriPrepare = do
     0 -> return $ Just pasori
     otherwise -> pasoriClose pasori >> return Nothing
 
+withPasori :: (Ptr Pasori -> IO a) -> IO (Maybe a)
+withPasori act = runMaybeT $ do
+  pasori <- MaybeT pasoriPrepare
+  result <- liftIO $ act pasori
+  liftIO $ pasoriClose pasori
+  return result
+
+pasoriClose :: Ptr Pasori -> IO() 
 pasoriClose = pasori_close
 
 foreign import ccall pasori_open :: IO (Ptr Pasori)
