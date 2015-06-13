@@ -2,6 +2,7 @@
 module Bindings.Libpafe.Pasori (
   pasoriPrepare
  ,pasoriClose
+ ,withPasori
 ) where
 
 #include <libpafe/libpafe.h>
