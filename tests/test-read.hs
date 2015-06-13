@@ -11,24 +11,23 @@ import Data.ByteString.Lazy
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.Maybe
 import Codec.Text.IConv
+import Control.Monad.Trans.Maybe
+import Control.Monad.IO.Class
+import Control.Monad
 
 import System.Exit (exitFailure)
 
-main = readPasori >>= print
+main :: IO()
+main = do
+  felicaStr <- withPasori $ runMaybeT . readFelica
+  print felicaStr
+  print $ fromJust $ join felicaStr
 
-readPasori :: IO String
-readPasori = do
-  maybePasori <- pasoriPrepare
-  case maybePasori of
-    Just pasori -> do
-      maybeFelicaPtr <- felicaPolling 0xfe00 0 0 pasori 
-      let felicaPtr = fromJust maybeFelicaPtr
-      felica <- withForeignPtr felicaPtr peek 
-      print "IDm is:"
-      print felica
-      print "PMm is:"
-      print $ pmm felica
-      pasoriClose pasori
-      return $ show felica
-    Nothing -> error "Pasori is not connected"
+readFelica :: Ptr Pasori -> MaybeT IO String
+readFelica pasori = do
+  liftIO $ print pasori
+  felicaPtr <- MaybeT $ felicaPolling 0xffff 0 0 pasori 
+  liftIO $ print felicaPtr
+  felica <- liftIO $ withForeignPtr felicaPtr peek 
+  return $ show felica
 
