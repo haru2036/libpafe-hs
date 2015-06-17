@@ -22,7 +22,8 @@ pasoriPrepare = do
     0 -> return $ Just pasori
     otherwise -> pasoriClose pasori >> return Nothing
 
-withPasori :: (Ptr Pasori -> IO a) -> IO (Maybe a)
+withPasori :: (Ptr Pasori -> IO a) -- ^ IO action that uses pointer to pasori
+              -> IO (Maybe a) -- ^ The result
 withPasori act = runMaybeT $ do
   pasori <- MaybeT pasoriPrepare
   result <- liftIO $ act pasori
