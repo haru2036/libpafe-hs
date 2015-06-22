@@ -12,8 +12,8 @@ import Foreign.Ptr
 import Foreign.C.Types
 import Bindings.Libpafe.Types
 import Control.Monad.Trans.Maybe
-import Control.Monad.IO.Class
-import Control.Exception.Base
+import Control.Monad.IO.Class (liftIO)
+import Control.Exception.Base (mask_)
 
 pasoriPrepare :: IO (Maybe (Ptr Pasori))
 pasoriPrepare = do
