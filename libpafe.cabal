@@ -33,8 +33,8 @@ library
   default-language:    Haskell2010
 
 Test-Suite test-read
-    type:              exitcode-stdio-1.0
-    main-is:           tests/test-read.hs
+  type:              exitcode-stdio-1.0
+  main-is:           tests/test-read.hs
   build-depends:       base >=4.6 && <4.8
                       ,libpafe >= 0.1.1.0
                       ,bytestring
@@ -43,8 +43,8 @@ Test-Suite test-read
   default-language:    Haskell2010
 
 Test-Suite test-read-fcf
-    type:              exitcode-stdio-1.0
-    main-is:           tests/test-read-fcf.hs
+  type:              exitcode-stdio-1.0
+  main-is:           tests/test-read-fcf.hs
   build-depends:       base >=4.6 && <4.8
                       ,libpafe >= 0.1.1.0
                       ,bytestring
