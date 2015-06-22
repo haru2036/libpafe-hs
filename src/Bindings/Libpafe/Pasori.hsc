@@ -13,6 +13,7 @@ import Foreign.C.Types
 import Bindings.Libpafe.Types
 import Control.Monad.Trans.Maybe
 import Control.Monad.IO.Class
+import Control.Exception.Base
 
 pasoriPrepare :: IO (Maybe (Ptr Pasori))
 pasoriPrepare = do
@@ -24,7 +25,7 @@ pasoriPrepare = do
 
 withPasori :: (Ptr Pasori -> IO a) -- ^ IO action that uses pointer to pasori
               -> IO (Maybe a) -- ^ The result
-withPasori act = runMaybeT $ do
+withPasori act = mask_ $ runMaybeT $ do
   pasori <- MaybeT pasoriPrepare
   result <- liftIO $ act pasori
   liftIO $ pasoriClose pasori
